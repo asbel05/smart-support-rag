@@ -1,0 +1,16 @@
+services:
+  postgres-vector:
+    image: pgvector/pgvector:pg17
+    container_name: smart_support_db
+    restart: always
+    environment:
+      POSTGRES_DB: smart_support_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+
+volumes:
+  pgvector_data:
