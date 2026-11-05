@@ -1,0 +1,6 @@
+@SmartSupportRag.Api_HostAddress = http://localhost:5296
+
+GET {{SmartSupportRag.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
