@@ -39,3 +39,38 @@ Accept: application/json
 }
 
 ###
+
+POST {{SmartSupportRag.Api_HostAddress}}/api/support/ask
+Content-Type: application/json
+Accept: application/json
+
+{
+  "question": "Compré un producto en etiqueta roja hace 12 días y está sellado, ¿puedo devolverlo y cuánto me cobran de flete?",
+  "category": "Devoluciones",
+  "topK": 3
+}
+
+###
+
+POST {{SmartSupportRag.Api_HostAddress}}/api/support/ask
+Content-Type: application/json
+Accept: application/json
+
+{
+  "question": "¿Cubre la garantía estándar una pantalla rota por caída?",
+  "category": "Garantias",
+  "topK": 2
+}
+
+###
+
+POST {{SmartSupportRag.Api_HostAddress}}/api/support/ask
+Content-Type: application/json
+Accept: application/json
+
+{
+  "question": "¿Aceptan pagos con criptomonedas como Bitcoin o Dogecoin?",
+  "topK": 3
+}
+
+###

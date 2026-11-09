@@ -45,6 +45,7 @@ builder.Services.AddSingleton<IChatClient>(
 builder.Services.AddSingleton<TextChunker>();
 builder.Services.AddScoped<IPolicyRepository, PolicyRepository>();
 builder.Services.AddScoped<IPolicyService, PolicyService>();
+builder.Services.AddScoped<ISupportRagService, SupportRagService>();
 
 var app = builder.Build();
 
