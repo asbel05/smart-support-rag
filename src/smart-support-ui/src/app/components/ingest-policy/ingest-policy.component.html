@@ -1,0 +1,54 @@
+@if (statusMessage()) {
+  <div class="notice notice-success">{{ statusMessage() }}</div>
+}
+
+@if (errorMessage()) {
+  <div class="notice notice-error">{{ errorMessage() }}</div>
+}
+
+<section class="panel">
+  <form class="form" (ngSubmit)="onSubmit()">
+    <div class="form-row-two">
+      <div class="field">
+        <label for="ingest-title">Título</label>
+        <input
+          id="ingest-title"
+          type="text"
+          name="title"
+          [(ngModel)]="title"
+          placeholder="Ej. Garantía de Monitores"
+          required />
+      </div>
+
+      <div class="field">
+        <label for="ingest-category">Categoría</label>
+        <select id="ingest-category" name="category" [(ngModel)]="category">
+          @for (cat of categories; track cat) {
+            <option [value]="cat">{{ cat }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="ingest-content">Contenido de la política</label>
+      <textarea
+        id="ingest-content"
+        name="content"
+        rows="6"
+        [(ngModel)]="content"
+        placeholder="Escribe el texto completo de la política..."
+        required></textarea>
+    </div>
+
+    <div class="form-footer">
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="isLoading() || !title.trim() || !content.trim()">
+        {{ isLoading() ? 'Guardando...' : 'Guardar política' }}
+      </button>
+    </div>
+  </form>
+</section>
+

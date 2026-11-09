@@ -1,0 +1,81 @@
+@if (errorMessage()) {
+  <div class="notice notice-error">{{ errorMessage() }}</div>
+}
+
+<section class="panel">
+  <form class="form" (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label for="ask-question">Pregunta</label>
+      <textarea
+        id="ask-question"
+        name="question"
+        rows="3"
+        [(ngModel)]="question"
+        placeholder="Escribe la consulta sobre devoluciones, garantías, envíos, términos o seguridad..."
+        required></textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="field">
+        <label for="ask-category">Categoría</label>
+        <select id="ask-category" name="selectedCategory" [(ngModel)]="selectedCategory">
+          <option value="">Todas</option>
+          @for (cat of categories; track cat) {
+            <option [value]="cat">{{ cat }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="ask-topk">Fragmentos</label>
+        <select id="ask-topk" name="topK" [(ngModel)]="topK">
+          <option [ngValue]="2">2</option>
+          <option [ngValue]="3">3</option>
+          <option [ngValue]="5">5</option>
+        </select>
+      </div>
+
+      <div class="field form-actions">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="isLoading() || !question.trim()">
+          {{ isLoading() ? 'Consultando...' : 'Consultar' }}
+        </button>
+      </div>
+    </div>
+  </form>
+</section>
+
+@if (askResult(); as result) {
+  <section class="panel result-section">
+    <div class="section-header">
+      <h2>Respuesta</h2>
+      @if (result.categoryFilter) {
+        <span class="tag">{{ result.categoryFilter }}</span>
+      }
+    </div>
+    <p class="answer-text">{{ result.answer }}</p>
+
+    @if (result.sources.length > 0) {
+      <div class="sources-block">
+        <h3>Fuentes ({{ result.sources.length }})</h3>
+        <div class="source-list">
+          @for (src of result.sources; track src.chunkId) {
+            <article class="source-item">
+              <div class="source-meta">
+                <span class="source-title">{{ src.documentTitle }}</span>
+                <div class="source-badges">
+                  <span class="tag">{{ src.category }}</span>
+                  <span class="score">Similitud: {{ src.similarityScore * 100 | number:'1.1-1' }}%</span>
+                </div>
+              </div>
+              <p class="source-content">{{ src.content }}</p>
+            </article>
+          }
+        </div>
+      </div>
+    }
+  </section>
+}
+

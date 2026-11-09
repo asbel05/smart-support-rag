@@ -1,0 +1,22 @@
+.answer-text {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: #1e293b;
+  white-space: pre-line;
+}
+
+.sources-block {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sources-block h3 {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+}
+

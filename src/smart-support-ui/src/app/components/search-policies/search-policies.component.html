@@ -1,0 +1,77 @@
+@if (errorMessage()) {
+  <div class="notice notice-error">{{ errorMessage() }}</div>
+}
+
+<section class="panel">
+  <form class="form" (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label for="search-query">Texto a buscar</label>
+      <input
+        id="search-query"
+        type="text"
+        name="searchQuery"
+        [(ngModel)]="searchQuery"
+        placeholder="Ej. plazo de devolución en liquidación..."
+        required />
+    </div>
+
+    <div class="form-row">
+      <div class="field">
+        <label for="search-category">Categoría</label>
+        <select id="search-category" name="selectedCategory" [(ngModel)]="selectedCategory">
+          <option value="">Todas</option>
+          @for (cat of categories; track cat) {
+            <option [value]="cat">{{ cat }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="search-topk">Resultados</label>
+        <select id="search-topk" name="topK" [(ngModel)]="topK">
+          <option [ngValue]="2">2</option>
+          <option [ngValue]="3">3</option>
+          <option [ngValue]="5">5</option>
+        </select>
+      </div>
+
+      <div class="field form-actions">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="isLoading() || !searchQuery.trim()">
+          {{ isLoading() ? 'Buscando...' : 'Buscar' }}
+        </button>
+      </div>
+    </div>
+  </form>
+</section>
+
+@if (searchResult(); as searchRes) {
+  <section class="panel result-section">
+    <div class="section-header">
+      <h2>Fragmentos encontrados ({{ searchRes.totalMatches }})</h2>
+    </div>
+
+    @if (searchRes.matches.length === 0) {
+      <p class="empty-text">No se encontraron fragmentos.</p>
+    } @else {
+      <div class="source-list">
+        @for (item of searchRes.matches; track item.chunkId) {
+          <article class="source-item">
+            <div class="source-meta">
+              <span class="source-title">{{ item.documentTitle }} (Chunk #{{ item.chunkIndex }})</span>
+              <div class="source-badges">
+                <span class="tag">{{ item.category }}</span>
+                <span class="score">Distancia: {{ item.cosineDistance | number:'1.4-4' }}</span>
+                <span class="score">Similitud: {{ item.similarityScore * 100 | number:'1.1-1' }}%</span>
+              </div>
+            </div>
+            <p class="source-content">{{ item.content }}</p>
+          </article>
+        }
+      </div>
+    }
+  </section>
+}
+
