@@ -1,40 +1,38 @@
 # SmartSupportRag
 
-Asistente de soporte al cliente para plataformas de comercio electrónico basado en **RAG (Retrieval-Augmented Generation)** y búsqueda vectorial en **PostgreSQL con `pgvector`**.
+Asistente RAG para políticas de comercio electrónico. Desde la interfaz puedes registrar políticas, buscar fragmentos y hacer consultas con el contexto recuperado a la vista.
 
-Permite ingestar, fragmentar y consultar políticas oficiales en 5 categorías base (`Devoluciones`, `Garantias`, `Envios`, `Terminos`, `Seguridad`), recuperando fragmentos relevantes por similitud de distancia coseno (`<=>` sobre índice HNSW) y generando respuestas precisas con citas de fuentes oficiales mediante un LLM (`gpt-6-luna`).
+**Stack** · ASP.NET Core (.NET 10), Angular 21, EF Core, PostgreSQL 17 con `pgvector` y Azure OpenAI con `Microsoft.Extensions.AI`.
 
----
+## Inicio local
 
-## Capacidades del Sistema
+Requiere el SDK de .NET 10, Node.js 24, Docker Compose y dos despliegues de Azure OpenAI, uno de chat y otro de embeddings de 1536 dimensiones. Si te falta la CLI de EF Core, instálala con `dotnet tool install --global dotnet-ef --version 10.0.14`.
 
-- **Ingesta y Fragmentación:** Fragmentación semántica con solapamiento (`overlap`) y cálculo de embeddings (1536 dimensiones) mediante `text-embedding-3-small`.
-- **Búsqueda Vectorial:** Búsqueda por distancia coseno con opción de filtrado explícito por categoría de soporte o búsqueda transversal en toda la base de conocimiento.
-- **Asistente RAG Grounded:** Generación de respuestas asistenciales con anclaje estricto en los fragmentos de políticas recuperados y citación explícita de documentos oficiales para mitigar alucinaciones.
+Desde la raíz del repositorio, inicia PostgreSQL con `docker compose up -d`. Cuando esté listo, configura Azure OpenAI y arranca la API.
 
----
+```powershell
+$env:AzureOpenAI__Endpoint = '<URL del recurso de Azure OpenAI>'
+$env:AzureOpenAI__ApiKey = [System.Net.NetworkCredential]::new('', (Read-Host 'Clave de Azure OpenAI' -AsSecureString)).Password
+$env:AzureOpenAI__ChatDeploymentName = '<despliegue de chat>'
+$env:AzureOpenAI__EmbeddingDeploymentName = '<despliegue de embeddings>'
 
-## Stack Tecnológico
+Set-Location src/SmartSupportRag.Api
+dotnet ef database update
+dotnet run --launch-profile http
+```
 
-- **Backend:** .NET 10 (ASP.NET Core Web API con Controllers clásicos)
-- **Datos:** EF Core 10 + Npgsql + `Pgvector.EntityFrameworkCore`
-- **Base de Datos:** PostgreSQL 17 + `pgvector` en Docker (puerto host `5434`)
-- **IA:** `Microsoft.Extensions.AI` (`Azure.AI.OpenAI` v2)
-- **Frontend:** Angular (Fase Final)
+En otra terminal, desde la raíz del repositorio, inicia Angular.
 
----
+```powershell
+Set-Location src/smart-support-ui
+npm ci
+npm start
+```
 
-## Documentación Técnica
+Abre `http://localhost:4200` y selecciona **Cargar políticas base** para empezar a consultar.
 
-Para arquitectura detallada, estructura en capas, modelo de datos y contratos de endpoints:
+## API
 
-👉 **[docs/SDD.md](./docs/SDD.md)**
+La API se sirve en `http://localhost:5296`. En desarrollo, el documento OpenAPI está en `/openapi/v1.json`.
 
----
-
-## Convención de Commits
-
-- `docs:` Documentación.
-- `chore:` Infraestructura, Docker, dependencias.
-- `feat:` Funcionalidades, endpoints, modelos o servicios.
-- `fix:` Corrección de errores.
+[Peticiones HTTP](src/SmartSupportRag.Api/SmartSupportRag.Api.http) · [Diseño del sistema](docs/SDD.md)
