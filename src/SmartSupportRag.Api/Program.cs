@@ -1,11 +1,14 @@
 using System.ClientModel;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using Azure.AI.OpenAI;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
 using OpenAI.Chat;
 using OpenAI.Embeddings;
 using SmartSupportRag.Api.Data;
+using SmartSupportRag.Api.Middleware;
 using SmartSupportRag.Api.Repositories;
 using SmartSupportRag.Api.Services;
 
@@ -17,6 +20,42 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 builder.Services.AddOpenApi();
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        var problemDetails = new ProblemDetails
+        {
+            Status = StatusCodes.Status429TooManyRequests,
+            Title = "Límite de peticiones excedido",
+            Detail = "Se alcanzó el máximo permitido de 6 peticiones por minuto. Intenta nuevamente en unos segundos.",
+            Instance = context.HttpContext.Request.Path
+        };
+
+        await context.HttpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+    };
+
+    options.AddPolicy("PerIpPolicy", httpContext =>
+    {
+        var clientIp = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: clientIp,
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 6,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            });
+    });
+});
 
 builder.Services.AddCors(options =>
 {
@@ -59,16 +98,20 @@ builder.Services.AddScoped<ISupportRagService, SupportRagService>();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+app.UseExceptionHandler();
 
 app.UseCors("AngularClient");
 
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
+}
+
+app.UseRateLimiter();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
 }
 
 app.UseAuthorization();

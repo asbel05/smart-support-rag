@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using SmartSupportRag.Api.DTOs.Policies;
+using SmartSupportRag.Api.Entities;
 using SmartSupportRag.Api.Services;
 
 namespace SmartSupportRag.Api.Controllers;
@@ -15,7 +17,24 @@ public class PoliciesController : ControllerBase
         _policyService = policyService;
     }
 
+    [HttpGet]
+    public async Task<ActionResult<PagedPoliciesResponse>> GetAll(
+        [FromQuery] PolicyCategory? category = null,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 5,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _policyService.GetPagedPoliciesAsync(
+            category,
+            pageNumber,
+            pageSize,
+            cancellationToken);
+
+        return Ok(response);
+    }
+
     [HttpPost("ingest")]
+    [EnableRateLimiting("PerIpPolicy")]
     public async Task<ActionResult<IngestPolicyResponse>> Ingest(
         [FromBody] IngestPolicyRequest request,
         CancellationToken cancellationToken)
@@ -37,6 +56,7 @@ public class PoliciesController : ControllerBase
     }
 
     [HttpPost("search")]
+    [EnableRateLimiting("PerIpPolicy")]
     public async Task<ActionResult<SearchPoliciesResponse>> Search(
         [FromBody] SearchPoliciesRequest request,
         CancellationToken cancellationToken)

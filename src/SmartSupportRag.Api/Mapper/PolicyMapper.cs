@@ -48,6 +48,50 @@ public static class PolicyMapper
         };
     }
 
+    public static PolicySummaryResponse ToSummaryResponse(this PolicyDocumentSummaryResult result)
+    {
+        return new PolicySummaryResponse
+        {
+            Id = result.Id,
+            Title = result.Title,
+            Category = result.Category,
+            CreatedAt = result.CreatedAt,
+            ChunksCount = result.ChunksCount,
+            Chunks = result.Chunks
+                .Select(c => new PolicyChunkItemResponse
+                {
+                    Id = c.Id,
+                    ChunkIndex = c.ChunkIndex,
+                    Content = c.Content
+                })
+                .ToList()
+        };
+    }
+
+    public static PagedPoliciesResponse ToPagedResponse(
+        this IReadOnlyList<PolicyDocumentSummaryResult> items,
+        int pageNumber,
+        int pageSize,
+        int totalCount)
+    {
+        var mappedItems = items
+            .Select(i => i.ToSummaryResponse())
+            .ToList();
+
+        var totalPages = totalCount == 0
+            ? 0
+            : (int)Math.Ceiling(totalCount / (double)pageSize);
+
+        return new PagedPoliciesResponse
+        {
+            Items = mappedItems,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalCount = totalCount,
+            TotalPages = totalPages
+        };
+    }
+
     public static PolicyChunkMatchResponse ToMatchResponse(this PolicyChunkSearchResult result)
     {
         var distance = Math.Round(result.CosineDistance, 4);

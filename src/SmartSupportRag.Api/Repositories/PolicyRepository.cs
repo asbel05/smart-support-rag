@@ -35,6 +35,47 @@ public class PolicyRepository : IPolicyRepository
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task<(IReadOnlyList<PolicyDocumentSummaryResult> Items, int TotalCount)> GetPagedDocumentsAsync(
+        PolicyCategory? category,
+        int pageNumber,
+        int pageSize,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _dbContext.PolicyDocuments.AsNoTracking();
+
+        if (category.HasValue)
+        {
+            query = query.Where(d => d.Category == category.Value);
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .OrderByDescending(d => d.CreatedAt)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(d => new PolicyDocumentSummaryResult
+            {
+                Id = d.Id,
+                Title = d.Title,
+                Category = d.Category,
+                CreatedAt = d.CreatedAt,
+                ChunksCount = d.Chunks.Count,
+                Chunks = d.Chunks
+                    .OrderBy(c => c.ChunkIndex)
+                    .Select(c => new PolicyChunkSummaryResult
+                    {
+                        Id = c.Id,
+                        ChunkIndex = c.ChunkIndex,
+                        Content = c.Content
+                    })
+                    .ToList()
+            })
+            .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
+    }
+
     public async Task<IReadOnlyList<PolicyChunkSearchResult>> SearchSimilarChunksAsync(
         Vector queryVector,
         PolicyCategory? category,
