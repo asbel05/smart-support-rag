@@ -1,14 +1,21 @@
 using System.ClientModel;
+using System.Text.Json.Serialization;
 using Azure.AI.OpenAI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
 using OpenAI.Chat;
 using OpenAI.Embeddings;
 using SmartSupportRag.Api.Data;
+using SmartSupportRag.Api.Repositories;
+using SmartSupportRag.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddOpenApi();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
@@ -34,6 +41,10 @@ builder.Services.AddSingleton<IEmbeddingGenerator<string, Embedding<float>>>(
 
 builder.Services.AddSingleton<IChatClient>(
     azureClient.GetChatClient(chatDeployment).AsIChatClient());
+
+builder.Services.AddSingleton<TextChunker>();
+builder.Services.AddScoped<IPolicyRepository, PolicyRepository>();
+builder.Services.AddScoped<IPolicyService, PolicyService>();
 
 var app = builder.Build();
 

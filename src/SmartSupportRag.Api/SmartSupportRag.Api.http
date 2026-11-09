@@ -1,6 +1,18 @@
 @SmartSupportRag.Api_HostAddress = http://localhost:5296
 
-GET {{SmartSupportRag.Api_HostAddress}}/weatherforecast/
+POST {{SmartSupportRag.Api_HostAddress}}/api/policies/seed
 Accept: application/json
+
+###
+
+POST {{SmartSupportRag.Api_HostAddress}}/api/policies/ingest
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Garantías de Laptops Corporativas",
+  "category": "Garantias",
+  "content": "Las laptops de línea corporativa cuentan con 24 meses de garantía en sitio con respuesta técnica en 24 horas hábiles. No cubre derrames de café ni pantallas fracturadas por presión en mochilas."
+}
 
 ###
