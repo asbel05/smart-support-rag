@@ -79,3 +79,25 @@ export interface SeedPoliciesResponse {
   message: string;
 }
 
+export interface PolicyChunkItemResponse {
+  id: string;
+  chunkIndex: number;
+  content: string;
+}
+
+export interface PolicySummaryResponse {
+  id: string;
+  title: string;
+  category: PolicyCategory;
+  createdAt: string;
+  chunksCount: number;
+  chunks: PolicyChunkItemResponse[];
+}
+
+export interface PagedPoliciesResponse {
+  items: PolicySummaryResponse[];
+  pageNumber: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}

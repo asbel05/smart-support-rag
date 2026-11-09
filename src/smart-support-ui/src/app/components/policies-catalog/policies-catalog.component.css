@@ -1,0 +1,152 @@
+.notice {
+  margin-bottom: 16px;
+}
+
+.catalog-toolbar {
+  display: grid;
+  grid-template-columns: 1fr 140px auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+}
+
+.catalog-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  text-align: left;
+}
+
+.catalog-table th,
+.catalog-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.catalog-table th {
+  background-color: #f8fafc;
+  font-weight: 600;
+  color: #334155;
+  font-size: 0.8125rem;
+}
+
+.row-expanded {
+  background-color: #f8fafc;
+}
+
+.col-title {
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.col-date {
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.btn-expand {
+  padding: 4px 10px;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  font-weight: 500;
+  color: #2563eb;
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-expand:hover {
+  background-color: #dbeafe;
+}
+
+.detail-row td {
+  background-color: #f8fafc;
+  padding: 16px;
+}
+
+.chunks-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chunks-title {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.chunks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chunk-box {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chunk-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.chunk-text {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #334155;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.pagination {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pagination-info {
+  font-size: 0.8125rem;
+  color: #475569;
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.8125rem;
+}
+
+.empty-text {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+@media (max-width: 640px) {
+  .catalog-toolbar {
+    grid-template-columns: 1fr;
+  }
+}

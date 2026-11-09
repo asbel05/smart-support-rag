@@ -1,0 +1,121 @@
+@if (errorMessage()) {
+  <div class="notice notice-error">{{ errorMessage() }}</div>
+}
+
+<div class="catalog-toolbar">
+  <div class="field">
+    <label for="catalog-category">Categoría</label>
+    <select
+      id="catalog-category"
+      name="selectedCategory"
+      [(ngModel)]="selectedCategory"
+      (ngModelChange)="onFilterChange()">
+      <option value="">Todas</option>
+      @for (cat of categories; track cat) {
+        <option [value]="cat">{{ cat }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="field">
+    <label for="catalog-size">Por página</label>
+    <select
+      id="catalog-size"
+      name="pageSize"
+      [(ngModel)]="pageSize"
+      (ngModelChange)="onFilterChange()">
+      <option [ngValue]="3">3</option>
+      <option [ngValue]="5">5</option>
+      <option [ngValue]="10">10</option>
+    </select>
+  </div>
+
+  <div class="field form-actions">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      [disabled]="isLoading()"
+      (click)="loadPolicies()">
+      {{ isLoading() ? 'Actualizando...' : 'Actualizar' }}
+    </button>
+  </div>
+</div>
+
+@if (pagedData(); as data) {
+  @if (data.items.length === 0) {
+    <p class="empty-text">No hay políticas registradas para este filtro.</p>
+  } @else {
+    <div class="table-wrapper">
+      <table class="catalog-table">
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Categoría</th>
+            <th>Fragmentos</th>
+            <th>Fecha</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of data.items; track item.id) {
+            <tr [class.row-expanded]="expandedPolicyId() === item.id">
+              <td class="col-title">{{ item.title }}</td>
+              <td><span class="tag">{{ item.category }}</span></td>
+              <td>{{ item.chunksCount }}</td>
+              <td class="col-date">{{ item.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>
+                <button
+                  type="button"
+                  class="btn-expand"
+                  (click)="toggleExpand(item.id)">
+                  {{ expandedPolicyId() === item.id ? 'Ocultar' : 'Ver contenido' }}
+                </button>
+              </td>
+            </tr>
+
+            @if (expandedPolicyId() === item.id) {
+              <tr class="detail-row">
+                <td colspan="5">
+                  <div class="chunks-container">
+                    <h4 class="chunks-title">Fragmentos vectorizados en base de datos:</h4>
+                    <div class="chunks-list">
+                      @for (chk of item.chunks; track chk.id) {
+                        <div class="chunk-box">
+                          <span class="chunk-badge">Chunk #{{ chk.chunkIndex }}</span>
+                          <p class="chunk-text">{{ chk.content }}</p>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <span class="pagination-info">
+        Total: {{ data.totalCount }} · Página {{ data.pageNumber }} de {{ data.totalPages }}
+      </span>
+
+      <div class="pagination-controls">
+        <button
+          type="button"
+          class="btn btn-secondary btn-sm"
+          [disabled]="isLoading() || data.pageNumber <= 1"
+          (click)="goToPage(data.pageNumber - 1)">
+          Anterior
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary btn-sm"
+          [disabled]="isLoading() || data.pageNumber >= data.totalPages"
+          (click)="goToPage(data.pageNumber + 1)">
+          Siguiente
+        </button>
+      </div>
+    </div>
+  }
+}

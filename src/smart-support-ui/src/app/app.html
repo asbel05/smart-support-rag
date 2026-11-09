@@ -2,13 +2,21 @@
   <header class="header">
     <div class="header-inner">
       <h1 class="app-title">Soporte de Políticas</h1>
-      <button
-        type="button"
-        class="btn btn-secondary"
-        [disabled]="isSeeding()"
-        (click)="onSeedPolicies()">
-        {{ isSeeding() ? 'Cargando...' : 'Cargar políticas base' }}
-      </button>
+      <div class="header-actions">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="openCatalogModal()">
+          Políticas registradas
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          [disabled]="isSeeding()"
+          (click)="onSeedPolicies()">
+          {{ isSeeding() ? 'Cargando...' : 'Cargar políticas base' }}
+        </button>
+      </div>
     </div>
   </header>
 
@@ -54,3 +62,23 @@
     }
   </main>
 </div>
+
+@if (isCatalogModalOpen()) {
+  <div class="modal-backdrop" (click)="closeCatalogModal()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">Políticas Registradas</h2>
+        <button
+          type="button"
+          class="modal-close-btn"
+          aria-label="Cerrar"
+          (click)="closeCatalogModal()">
+          ✕
+        </button>
+      </div>
+      <div class="modal-body">
+        <app-policies-catalog />
+      </div>
+    </div>
+  </div>
+}
