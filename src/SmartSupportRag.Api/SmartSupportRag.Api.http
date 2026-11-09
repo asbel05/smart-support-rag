@@ -16,3 +16,26 @@ Accept: application/json
 }
 
 ###
+
+POST {{SmartSupportRag.Api_HostAddress}}/api/policies/search
+Content-Type: application/json
+Accept: application/json
+
+{
+  "query": "¿Cuántos días tengo para devolver un producto en liquidación?",
+  "category": "Devoluciones",
+  "topK": 3
+}
+
+###
+
+POST {{SmartSupportRag.Api_HostAddress}}/api/policies/search
+Content-Type: application/json
+Accept: application/json
+
+{
+  "query": "¿Qué pasa si intento iniciar sesión 5 veces mal?",
+  "topK": 2
+}
+
+###

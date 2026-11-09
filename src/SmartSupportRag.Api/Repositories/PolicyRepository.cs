@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Pgvector;
+using Pgvector.EntityFrameworkCore;
 using SmartSupportRag.Api.Data;
 using SmartSupportRag.Api.Entities;
 
@@ -15,7 +17,10 @@ public class PolicyRepository : IPolicyRepository
 
     public async Task<IReadOnlyList<string>> GetExistingTitlesAsync(CancellationToken cancellationToken = default)
     {
-        return await _dbContext.PolicyDocuments.AsNoTracking().Select(d => d.Title).ToListAsync(cancellationToken);
+        return await _dbContext.PolicyDocuments
+            .AsNoTracking()
+            .Select(d => d.Title)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task AddDocumentAsync(PolicyDocument document, CancellationToken cancellationToken = default)
@@ -29,5 +34,31 @@ public class PolicyRepository : IPolicyRepository
         _dbContext.PolicyDocuments.AddRange(documents);
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
-}
 
+    public async Task<IReadOnlyList<PolicyChunkSearchResult>> SearchSimilarChunksAsync(
+        Vector queryVector,
+        PolicyCategory? category,
+        int topK,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _dbContext.PolicyChunks
+            .AsNoTracking()
+            .Where(c => c.Embedding != null);
+
+        if (category.HasValue)
+        {
+            query = query.Where(c => c.Category == category.Value);
+        }
+
+        return await query
+            .OrderBy(c => c.Embedding!.CosineDistance(queryVector))
+            .Take(topK)
+            .Select(c => new PolicyChunkSearchResult
+            {
+                Chunk = c,
+                DocumentTitle = c.Document != null ? c.Document.Title : string.Empty,
+                CosineDistance = c.Embedding!.CosineDistance(queryVector)
+            })
+            .ToListAsync(cancellationToken);
+    }
+}

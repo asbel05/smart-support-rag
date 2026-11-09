@@ -35,4 +35,18 @@ public class PoliciesController : ControllerBase
         var response = await _policyService.SeedAsync(cancellationToken);
         return Ok(response);
     }
+
+    [HttpPost("search")]
+    public async Task<ActionResult<SearchPoliciesResponse>> Search(
+        [FromBody] SearchPoliciesRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(request.Query))
+        {
+            return BadRequest("La consulta de búsqueda no puede estar vacía.");
+        }
+
+        var response = await _policyService.SearchAsync(request, cancellationToken);
+        return Ok(response);
+    }
 }

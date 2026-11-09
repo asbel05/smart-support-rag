@@ -2,9 +2,10 @@ using SmartSupportRag.Api.Entities;
 
 namespace SmartSupportRag.Api.DTOs.Policies;
 
-public record IngestPolicyResponse(
-    Guid DocumentId,
-    string Title,
-    PolicyCategory Category,
-    int ChunksCreated);
-
+public class IngestPolicyResponse
+{
+    public Guid DocumentId { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public PolicyCategory Category { get; set; }
+    public int ChunksCreated { get; set; }
+}

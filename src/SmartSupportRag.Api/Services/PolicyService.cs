@@ -1,4 +1,5 @@
 using Microsoft.Extensions.AI;
+using Pgvector;
 using SmartSupportRag.Api.Data;
 using SmartSupportRag.Api.DTOs.Policies;
 using SmartSupportRag.Api.Entities;
@@ -44,10 +45,12 @@ public class PolicyService : IPolicyService
 
         if (policiesToInsert.Count == 0)
         {
-            return new SeedPoliciesResponse(
-                DocumentsCreated: 0,
-                TotalChunksCreated: 0,
-                Message: "Las políticas base ya se encuentran cargadas en la base de datos.");
+            return new SeedPoliciesResponse
+            {
+                DocumentsCreated = 0,
+                TotalChunksCreated = 0,
+                Message = "Las políticas base ya se encuentran cargadas en la base de datos."
+            };
         }
 
         var documents = new List<PolicyDocument>(policiesToInsert.Count);
@@ -62,10 +65,31 @@ public class PolicyService : IPolicyService
 
         await _policyRepository.AddDocumentsRangeAsync(documents, cancellationToken);
 
-        return new SeedPoliciesResponse(
-            DocumentsCreated: documents.Count,
-            TotalChunksCreated: totalChunks,
-            Message: "Políticas iniciales cargadas y vectorizadas correctamente.");
+        return new SeedPoliciesResponse
+        {
+            DocumentsCreated = documents.Count,
+            TotalChunksCreated = totalChunks,
+            Message = "Políticas iniciales cargadas y vectorizadas correctamente."
+        };
+    }
+
+    public async Task<SearchPoliciesResponse> SearchAsync(
+        SearchPoliciesRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var topK = Math.Clamp(request.TopK, 1, 20);
+        var generatedEmbeddings = await _embeddingGenerator.GenerateAsync(
+            [request.Query.Trim()],
+            cancellationToken: cancellationToken);
+
+        var queryVector = new Vector(generatedEmbeddings[0].Vector);
+        var results = await _policyRepository.SearchSimilarChunksAsync(
+            queryVector,
+            request.Category,
+            topK,
+            cancellationToken);
+
+        return results.ToSearchResponse(request);
     }
 
     private async Task<PolicyDocument> BuildDocumentWithEmbeddingsAsync(
@@ -80,4 +104,3 @@ public class PolicyService : IPolicyService
         return request.ToEntity(textChunks, generatedEmbeddings);
     }
 }
-

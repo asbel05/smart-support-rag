@@ -3,8 +3,14 @@ using SmartSupportRag.Api.Entities;
 
 namespace SmartSupportRag.Api.DTOs.Policies;
 
-public record IngestPolicyRequest(
-    [Required] string Title,
-    [Required] PolicyCategory Category,
-    [Required] string Content);
+public class IngestPolicyRequest
+{
+    [Required]
+    public string Title { get; set; } = string.Empty;
 
+    [Required]
+    public PolicyCategory Category { get; set; }
+
+    [Required]
+    public string Content { get; set; } = string.Empty;
+}

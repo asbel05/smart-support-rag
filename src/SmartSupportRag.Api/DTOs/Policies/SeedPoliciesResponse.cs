@@ -1,7 +1,8 @@
 namespace SmartSupportRag.Api.DTOs.Policies;
 
-public record SeedPoliciesResponse(
-    int DocumentsCreated,
-    int TotalChunksCreated,
-    string Message);
-
+public class SeedPoliciesResponse
+{
+    public int DocumentsCreated { get; set; }
+    public int TotalChunksCreated { get; set; }
+    public string Message { get; set; } = string.Empty;
+}
