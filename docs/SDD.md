@@ -14,7 +14,7 @@ Actualmente, la operación enfrenta un grave problema de eficiencia: todas las r
 
 Los agentes de soporte pierden una cantidad crítica de tiempo buscando manualmente información dentro de estos extensos archivos. Esto genera altos tiempos de espera, saturación en los canales de atención y respuestas inconsistentes que impactan negativamente la experiencia del usuario.
 
-Por lo tanto, se requiere un sistema capaz de identificar de forma automatizada la categoría o intención de la consulta para extraer con precisión únicamente los fragmentos de texto correspondientes antes de consultar al LLM, garantizando respuestas rápidas, consistentes y respaldadas en la documentación oficial. La base de conocimiento se estructura inicialmente en 5 categorías principales preparadas para escalar a futuro.
+Por lo tanto, se requiere un sistema centralizado de recuperación y generación aumentada (RAG) que permita extraer con precisión los fragmentos de texto correspondientes mediante búsqueda vectorial con filtrado por categoría antes de consultar al LLM, garantizando respuestas rápidas, consistentes y respaldadas en la documentación oficial. La base de conocimiento se estructura en 5 categorías principales (`Devoluciones`, `Garantias`, `Envios`, `Terminos` y `Seguridad`).
 
 ---
 
