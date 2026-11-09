@@ -50,9 +50,11 @@ export class IngestPolicyComponent {
             `Política "${res.title}" guardada correctamente (${res.chunksCreated} fragmentos).`
           );
         },
-        error: () => {
+        error: (err) => {
           this.isLoading.set(false);
-          this.errorMessage.set('No se pudo guardar la política.');
+          this.errorMessage.set(
+            this.api.extractErrorMessage(err, 'No se pudo guardar la política.')
+          );
         }
       });
   }

@@ -21,6 +21,7 @@ export class AskSupportComponent {
   readonly isLoading = signal<boolean>(false);
   readonly errorMessage = signal<string>('');
   readonly askResult = signal<AskSupportResponse | null>(null);
+  readonly copied = signal<boolean>(false);
 
   question = '';
   selectedCategory: PolicyCategory | '' = '';
@@ -33,6 +34,8 @@ export class AskSupportComponent {
     }
 
     this.errorMessage.set('');
+    this.copied.set(false);
+    this.askResult.set(null);
     this.isLoading.set(true);
 
     this.api
@@ -46,11 +49,26 @@ export class AskSupportComponent {
           this.isLoading.set(false);
           this.askResult.set(res);
         },
-        error: () => {
+        error: (err) => {
           this.isLoading.set(false);
-          this.errorMessage.set('No se pudo obtener respuesta del asistente.');
+          this.askResult.set(null);
+          this.errorMessage.set(
+            this.api.extractErrorMessage(err, 'No se pudo obtener respuesta del asistente.')
+          );
         }
       });
   }
-}
 
+  copyAnswer(text: string): void {
+    if (!text) {
+      return;
+    }
+
+    navigator.clipboard.writeText(text).then(() => {
+      this.copied.set(true);
+      setTimeout(() => {
+        this.copied.set(false);
+      }, 2000);
+    });
+  }
+}

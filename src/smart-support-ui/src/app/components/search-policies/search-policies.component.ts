@@ -33,6 +33,7 @@ export class SearchPoliciesComponent {
     }
 
     this.errorMessage.set('');
+    this.searchResult.set(null);
     this.isLoading.set(true);
 
     this.api
@@ -46,9 +47,12 @@ export class SearchPoliciesComponent {
           this.isLoading.set(false);
           this.searchResult.set(res);
         },
-        error: () => {
+        error: (err) => {
           this.isLoading.set(false);
-          this.errorMessage.set('No se pudo realizar la búsqueda de fragmentos.');
+          this.searchResult.set(null);
+          this.errorMessage.set(
+            this.api.extractErrorMessage(err, 'No se pudo realizar la búsqueda de fragmentos.')
+          );
         }
       });
   }

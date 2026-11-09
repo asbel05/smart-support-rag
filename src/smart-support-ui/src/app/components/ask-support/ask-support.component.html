@@ -50,32 +50,44 @@
 @if (askResult(); as result) {
   <section class="panel result-section">
     <div class="section-header">
-      <h2>Respuesta</h2>
-      @if (result.categoryFilter) {
-        <span class="tag">{{ result.categoryFilter }}</span>
-      }
+      <div class="header-left">
+        <h2>Respuesta</h2>
+        @if (result.categoryFilter) {
+          <span class="tag">{{ result.categoryFilter }}</span>
+        }
+      </div>
+
+      <button
+        type="button"
+        class="btn btn-copy"
+        [class.copied]="copied()"
+        (click)="copyAnswer(result.answer)">
+        {{ copied() ? 'Copiado ✓' : 'Copiar respuesta' }}
+      </button>
     </div>
+
     <p class="answer-text">{{ result.answer }}</p>
 
     @if (result.sources.length > 0) {
       <div class="sources-block">
-        <h3>Fuentes ({{ result.sources.length }})</h3>
+        <h3>Fuentes citadas ({{ result.sources.length }})</h3>
         <div class="source-list">
           @for (src of result.sources; track src.chunkId) {
-            <article class="source-item">
-              <div class="source-meta">
-                <span class="source-title">{{ src.documentTitle }}</span>
+            <details class="source-accordion">
+              <summary class="source-summary">
+                <span class="source-title">{{ src.documentTitle }} (Chunk #{{ src.chunkIndex }})</span>
                 <div class="source-badges">
                   <span class="tag">{{ src.category }}</span>
                   <span class="score">Similitud: {{ src.similarityScore * 100 | number:'1.1-1' }}%</span>
                 </div>
+              </summary>
+              <div class="source-body">
+                <p class="source-content">{{ src.content }}</p>
               </div>
-              <p class="source-content">{{ src.content }}</p>
-            </article>
+            </details>
           }
         </div>
       </div>
     }
   </section>
 }
-
